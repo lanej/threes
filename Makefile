@@ -1,6 +1,7 @@
 GO_BIN ?= go
 VERSION := $(shell git describe --tags)
 DIST_DIRS := find * -type d -exec
+GO_PACKAGES := board
 
 build:
 	${GO_BIN} build -o threes -ldflags "-X main.version=${VERSION}" threes.go
@@ -10,10 +11,10 @@ install: build
 	install -m 755 ./threes ${DESTDIR}/usr/local/bin/threes
 
 test:
-	${GO_BIN} test . ./board
+	${GO_BIN} test ./ $(addprefix ./,${GO_PACKAGES})
 
 testv:
-	${GO_BIN} test -v . ./board
+	${GO_BIN} test -v . $(addprefix ./,${GO_PACKAGES})
 
 integration-test:
 	${GO_BIN} build

@@ -10,7 +10,7 @@ type Board struct {
 	deck  Deck
 }
 
-func newBoard(starter int) *Board {
+func newBoard(starter int) (*Board, error) {
 	// Initialize Board
 	board := Board{
 		tiles: [][]int{
@@ -21,17 +21,45 @@ func newBoard(starter int) *Board {
 		},
 		deck: Deck{},
 	}
-
 	// Starter value goes in a random corner, seemingly rotates
 	startCornerRow := rand.Intn(1) * 3
 	startCornerCol := rand.Intn(1) * 3
 
-	board.tiles[startCornerRow][startCornerCol] = starter
+	insertErr := board.insert(startCornerRow, startCornerCol, starter)
 
 	// Of the 8 starter tiles, there are between 1-4 {1,2,3}
-	return new(Board)
+	return &board, insertErr
 }
 
 func (b *Board) print() {
-	fmt.Println("something")
+	for row := 0; row < 4; row++ {
+		for col := 0; col < 4; col++ {
+			fmt.Printf("|% 4d", b.tiles[row][col])
+		}
+		fmt.Println("|")
+	}
+}
+
+type InvalidValueError struct {
+	Value int
+}
+
+func (e InvalidValueError) Error() string {
+	return fmt.Sprintf("Invalid value: %d", e.Value)
+}
+
+func (b *Board) insert(x, y, v int) error {
+	valid := false
+
+	for _, a := range Values {
+		valid = valid || (a == v)
+	}
+
+	if !valid {
+		return InvalidValueError{Value: v}
+	}
+
+	b.tiles[x][y] = v
+
+	return nil
 }
